@@ -2,8 +2,6 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-
-
 //Cadastro de usuário
 $app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $response){
 
@@ -33,7 +31,6 @@ $app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $res
 	$sqlCidadao = "INSERT INTO Cidadao (sexo,fk_usuario_cidadao) VALUES (:sexo,:fk_usuario_cidadao)";
 
 	
-
 	try
 	{
 		$db = new db();
@@ -78,13 +75,8 @@ $app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $res
 	}
 });
 
-
-
-
-
-
-
-$app->get('/usuario/exibir/cidadao/{id}',function(Request $request, Response $response){
+//Exibir cidadao por id
+$app->get('/usuario/exibir/{id}',function(Request $request, Response $response){
 	$id = $request->getAttribute('id');
 
 	$sql = "SELECT * FROM Usuario where id_usuario = $id";
@@ -99,7 +91,35 @@ $app->get('/usuario/exibir/cidadao/{id}',function(Request $request, Response $re
 		$stmt = $db->query($sql);
 		$usuarios	 = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db  = null;
-		return json_encode($usuarios);
+		if($usuarios){
+			return json_encode($usuarios);
+		}
+		else{
+			return json_encode("Id Invalido");
+		}
+	}
+	catch(PDOException $e)
+	{
+		echo '{"error": {"text": '.$e->getMessage().'}';
+	}
+
+});
+//Excluir cidadao por id
+$app->get('/usuario/excluir/{id}',function(Request $request, Response $response){
+	$id = $request->getAttribute('id');
+
+	$sql = "DELETE FROM Usuario where id_usuario = $id";
+
+	try
+	{
+		$db = new db();
+
+		$db = $db->connect();
+
+
+		$stmt = $db->query($sql);
+		$db  = null;
+		return json_encode(1);
 	}
 	catch(PDOException $e)
 	{

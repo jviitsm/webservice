@@ -11,5 +11,6 @@ $app = new \Slim\App;
 //Rotas dos clientes
 require '../src/routes/clientes.php';
 require '../src/routes/cadastro.php';
+require '../src/routes/login.php';
 
 $app->run();
