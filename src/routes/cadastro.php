@@ -5,7 +5,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 
 //Cadastro de usuário
-$app->post('/usuario/cadastrar',function(Request $request, Response $response){
+$app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $response){
 
 	//Tabela usuario
 	$nome = $request->getParam('nome');
@@ -84,7 +84,7 @@ $app->post('/usuario/cadastrar',function(Request $request, Response $response){
 
 
 
-$app->get('/usuario/exibir/{id}',function(Request $request, Response $response){
+$app->get('/usuario/exibir/cidadao/{id}',function(Request $request, Response $response){
 	$id = $request->getAttribute('id');
 
 	$sql = "SELECT * FROM Usuario where id_usuario = $id";
