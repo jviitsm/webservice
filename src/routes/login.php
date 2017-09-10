@@ -32,13 +32,13 @@ $app->post('/login/usuario',function(Request $request, Response $response){
 			return json_encode($retornoLogin);
 		}
 		else{
-			return json_encode("Login Invalido");
+			return json_encode("0");
 		}
 
 	}
 	catch(PDOException $e)
 	{
-		echo '{"error": {"text": '.$e->getMessage().'}';
+		return json_encode($e->getMessage());
 	}
 
 });
