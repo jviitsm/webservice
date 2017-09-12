@@ -5,30 +5,33 @@ use \Psr\Http\Message\ResponseInterface as Response;
 //Cadastro de usuário
 $app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $response){
 
-	//Tabela usuario
-	$nome = $request->getParam('nome');
-	$sobrenome = $request->getParam('sobrenome');
-	$estado = $request->getParam('estado');
-	$cidade = $request->getParam('cidade');
-	$dir_foto_usuario = $request->getParam('dir_foto_usuario');
+	//Tabela Login
 	$email = $request->getParam('email');
 	$login = $request->getParam('login');
 	$senha = $request->getParam('senha');
 	$status_login = $request->getParam('status_login');
 	$administrador = $request->getParam('administrador');
 
+
 	//Tabela cidadao
 	$sexo = $request->getParam('sexo');
+	$nome = $request->getParam('nome');
+	$sobrenome = $request->getParam('sobrenome');
+	$estado = $request->getParam('estado');
+	$cidade = $request->getParam('cidade');
+	$dir_foto_usuario = $request->getParam('dir_foto_usuario');
+
+
+
+
+
+	$sqlLogin = "INSERT INTO Login (email,login,senha,status_login,administrador) VALUES 
+	(:email,:login,:senha,:status_login,:administrador)"; 
 	
+	$sql_fk_login_cidadao = "SELECT id_login from Login where login ='$login'";
 
-
-	$sqlUsuario = "INSERT INTO Usuario (nome,sobrenome,estado,cidade,dir_foto_usuario,email,login,senha
-	,status_login,administrador) VALUES 
-	(:nome,:sobrenome,:estado,:cidade,:dir_foto_usuario,:email,:login,:senha,:status_login,:administrador)";
-	
-	$sqlForeignKey = "SELECT id_usuario from Usuario where login ='$login'";
-
-	$sqlCidadao = "INSERT INTO Cidadao (sexo,fk_usuario_cidadao) VALUES (:sexo,:fk_usuario_cidadao)";
+	$sqlCidadao = "INSERT INTO Cidadao (sexo,nome,sobrenome,estado,cidade,dir_foto_usuario,fk_login_cidadao) VALUES (:sexo,:nome,
+	:sobrenome,:estado,:cidade,:dir_foto_usuario,:fk_login_cidadao)";
 
 	
 	try
@@ -37,117 +40,120 @@ $app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $res
 
 		$db = $db->connect();
 
-		$stmt = $db->prepare($sqlUsuario);
-		$stm2 = $db->prepare($sqlForeignKey);
+		$stmt = $db->prepare($sqlLogin);
+		$stm2 = $db->prepare($sql_fk_login_cidadao);
 		$stm3 = $db->prepare($sqlCidadao);
 
-		$stmt->bindParam(':nome', $nome);
-		$stmt->bindParam(':sobrenome', $sobrenome);
-		$stmt->bindParam(':estado', $estado);
-		$stmt->bindParam(':cidade', $cidade);
-		$stmt->bindParam(':dir_foto_usuario', $dir_foto_usuario);
-		$stmt->bindParam(':email', $email);
-		$stmt->bindParam(':login', $login);
-		$stmt->bindParam(':senha', $senha);
+		$stmt->bindParam(':email',$email);
+		$stmt->bindParam(':login',$login);
+		$stmt->bindParam(':senha',$senha);
 		$stmt->bindParam(':status_login',$status_login);
 		$stmt->bindParam(':administrador',$administrador);
 
 
 	
 		$stmt->execute();
-		$stmt2 = $db->query($sqlForeignKey);
+		$stmt2 = $db->query($sql_fk_login_cidadao);
 		
-		$fk_usuario_cidadao = $stmt2->fetch(PDO::FETCH_NUM);
+		$fk_login_cidadao = $stmt2->fetch(PDO::FETCH_NUM);
 
-		$stm3->bindValue(':sexo',$sexo);
-		$stm3->bindValue(':fk_usuario_cidadao',$fk_usuario_cidadao[0]);
+		$stm3->bindParam(':sexo',$sexo);
+		$stm3->bindParam(':nome',$nome);
+		$stm3->bindParam(':sobrenome',$sobrenome);
+		$stm3->bindParam(':estado',$estado);
+		$stm3->bindParam(':cidade',$cidade);
+		$stm3->bindParam(':dir_foto_usuario',$dir_foto_usuario);
+		$stm3->bindValue(':fk_login_cidadao',$fk_login_cidadao[0]);
 		
 		$stm3->execute();
 
-		return json_encode($fk_usuario_cidadao);
+		return json_encode($fk_login_cidadao);
 
 		
 	}
 	catch(PDOException $e)
 	{
-		echo '{"error": {"text": '.$e->getMessage().'}';
+		return json_encode($e->getMessage());
 	}
 });
+
+
+
+
 //Cadastrar Usuario Empresa
 $app->post('/usuario/cadastrar/empresa',function(Request $request, Response $response){
 
-	//Tabela usuario
-	$nome = $request->getParam('nome');
-	$sobrenome = $request->getParam('sobrenome');
-	$estado = $request->getParam('estado');
-	$cidade = $request->getParam('cidade');
-	$dir_foto_usuario = $request->getParam('dir_foto_usuario');
+	//Tabela Login
 	$email = $request->getParam('email');
 	$login = $request->getParam('login');
 	$senha = $request->getParam('senha');
 	$status_login = $request->getParam('status_login');
 	$administrador = $request->getParam('administrador');
+
 
 	//Tabela Empresa
 	$cnpj = $request->getParam('cnpj');
 	$razao_social = $request->getParam('razao_social');
-	
+	$nome_fantasia = $request->getParam('nome_fantasia');
+	$estado = $request->getParam('estado');
+	$cidade = $request->getParam('cidade');
+	$dir_foto_usuario = $request->getParam('dir_foto_usuario');
 
 
-	$sqlUsuario = "INSERT INTO Usuario (nome,sobrenome,estado,cidade,dir_foto_usuario,email,login,senha
-	,status_login,administrador) VALUES 
-	(:nome,:sobrenome,:estado,:cidade,:dir_foto_usuario,:email,:login,:senha,:status_login,:administrador)";
-	
-	$sqlForeignKey = "SELECT id_usuario from Usuario where login ='$login'";
 
-	$sqlEmpresa = "INSERT INTO Empresa (cnpj,razao_social,fk_usuario_empresa) VALUES (:cnpj,:razao_social,:fk_usuario_empresa)";
+	//SQLS
 
-	
+	$sqlLogin = "INSERT INTO Login (email,login,senha,status_login,administrador) VALUES 
+	(:email,:login,:senha,:status_login,:administrador)"; 
+
+	$sql_fk_login_empresa = "SELECT id_login from Login where login ='$login'";
+
+	$sqlEmpresa = "INSERT INTO Empresa (cnpj,razao_social,nome_fantasia,estado,cidade,dir_foto_usuario,fk_login_empresa) VALUES 
+	(:cnpj,:razao_social,:nome_fantasia,:estado,:cidade,:dir_foto_usuario,:fk_login_empresa)";
+
+
 	try
-	{
-		$db = new db();
+		{
+			$db = new db();
 
-		$db = $db->connect();
+			$db = $db->connect();
 
-		$stmt = $db->prepare($sqlUsuario);
-		$stm2 = $db->prepare($sqlForeignKey);
-		$stm3 = $db->prepare($sqlEmpresa);
+			$stmt = $db->prepare($sqlLogin);
+			$stm2 = $db->prepare($sql_fk_login_empresa);
+			$stm3 = $db->prepare($sqlEmpresa);
 
-		$stmt->bindParam(':nome', $nome);
-		$stmt->bindParam(':sobrenome', $sobrenome);
-		$stmt->bindParam(':estado', $estado);
-		$stmt->bindParam(':cidade', $cidade);
-		$stmt->bindParam(':dir_foto_usuario', $dir_foto_usuario);
-		$stmt->bindParam(':email', $email);
-		$stmt->bindParam(':login', $login);
-		$stmt->bindParam(':senha', $senha);
-		$stmt->bindParam(':status_login',$status_login);
-		$stmt->bindParam(':administrador',$administrador);
+			$stmt->bindParam(':email',$email);
+			$stmt->bindParam(':login',$login);
+			$stmt->bindParam(':senha',$senha);
+			$stmt->bindParam(':status_login',$status_login);
+			$stmt->bindParam(':administrador',$administrador);
 
 
-	
-		$stmt->execute();
-		$stmt2 = $db->query($sqlForeignKey);
 		
-		$fk_usuario_empresa = $stmt2->fetch(PDO::FETCH_NUM);
+			$stmt->execute();
+			$stmt2 = $db->query($sql_fk_login_empresa);
+			
+			$fk_login_empresa = $stmt2->fetch(PDO::FETCH_NUM);
 
-		$stm3->bindParam(':cnpj',$cnpj);
-		$stm3->bindParam(':razao_social',$razao_social);
-		$stm3->bindParam(':fk_usuario_empresa',$fk_usuario_empresa[0]);
-		
-		$stm3->execute();
+			$stm3->bindParam(':cnpj',$cnpj);
+			$stm3->bindParam(':razao_social',$razao_social);
+			$stm3->bindParam(':nome_fantasia',$nome_fantasia);
+			$stm3->bindParam(':estado',$estado);
+			$stm3->bindParam(':cidade',$cidade);
+			$stm3->bindParam(':dir_foto_usuario',$dir_foto_usuario);
+			$stm3->bindValue(':fk_login_empresa',$fk_login_empresa[0]);
+			
+			$stm3->execute();
 
-		return json_encode(1);
-		
-		
-	}
-	catch(PDOException $e)
-	{
-	return json_encode($e->getMessage());	}
-});
+			return json_encode($fk_login_empresa);
 
-
-
+			
+		}
+		catch(PDOException $e)
+		{
+			return json_encode($e->getMessage());
+		}
+	});
 
 
 
