@@ -10,8 +10,7 @@ $app->post('/login/usuario',function(Request $request, Response $response){
 	$senha = $request->getParam('senha');
 
 
-	$sqlLogin =  "SELECT * FROM Usuario WHERE login = '$login' AND senha = '$senha'";
-
+	$sqlLogin = "SELECT * from Login JOIN Cidadao ON (Cidadao.fk_login_cidadao = Login.id_login) where Login.login = '$login' AND Login.senha= '$senha' ";
 
 	try
 	{
@@ -21,12 +20,13 @@ $app->post('/login/usuario',function(Request $request, Response $response){
 
 		$stmt = $db->prepare($sqlLogin);
 
-
 		$stmt->bindParam(':login', $login);
 		$stmt->bindParam(':senha', $senha);
 
 		$stmt->execute();
 		$retornoLogin = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+
 
 		if($retornoLogin){
 			return json_encode($retornoLogin);

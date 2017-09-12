@@ -67,7 +67,7 @@ $app->post('/usuario/cadastrar/cidadao',function(Request $request, Response $res
 		
 		$stm3->execute();
 
-		return json_encode($fk_login_cidadao);
+		
 
 		
 	}
@@ -145,7 +145,7 @@ $app->post('/usuario/cadastrar/empresa',function(Request $request, Response $res
 			
 			$stm3->execute();
 
-			return json_encode($fk_login_empresa);
+			
 
 			
 		}
